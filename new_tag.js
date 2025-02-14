@@ -9,12 +9,15 @@
 // @grant        none
 // ==/UserScript==
 
-// config
-const BUTTON_NAME = 'New API PKG';
-const TAG_PREFIX = 'my-api-pkg/'; // not required
-// config
-
 const PROJECT_PATH = getProjectPath();
+
+// config
+const BUTTON_NAME = 'New API';
+const BUTTON_BACKGROUND = 'confirm'; // enum: confirm, danger
+const TAG_PREFIX = 'pkg/' + getProjectName() + '-api/'; // not required, example: pkg/service-api/
+const DROP_ORIGINAL_BUTTON = false;
+const DROPDOWN_ID = 'dropdown-' + getProjectName();
+// config
 
 (function() {
     'use strict';
@@ -26,9 +29,9 @@ const PROJECT_PATH = getProjectPath();
 
     const button = document.createElement('button')
     setAttributes(button, {
-        class: 'btn btn-secondary dropdown-toggle',
+        class: `gl-button btn btn-${BUTTON_BACKGROUND} dropdown-toggle`,
         type: 'button',
-        id: 'dropdownMenuButton',
+        id: DROPDOWN_ID,
         'data-toggle': 'dropdown',
         'aria-haspopup': 'true',
         'aria-expanded': 'false',
@@ -38,7 +41,7 @@ const PROJECT_PATH = getProjectPath();
     const menu = document.createElement('div')
     setAttributes(menu, {
         'class': 'dropdown-menu',
-        'aria-labelledby': 'dropdownMenuButton',
+        'aria-labelledby': DROPDOWN_ID,
     })
 
     menu.replaceChildren(
@@ -74,7 +77,13 @@ function insertDropdown(headings, dropdown) {
             items.push(dropdown)
         }
 
-        items.push(c)
+        if (DROP_ORIGINAL_BUTTON) {
+            if (i < headings.childNodes.length - 2) {
+                items.push(c)
+            }
+        } else {
+            items.push(c)
+        }
 
         i++
     }
@@ -99,6 +108,12 @@ function getProjectPath() {
     const right = window.location.href.substring(prefix.length)
 
     return right.substring(1, right.indexOf(suffix))
+}
+
+function getProjectName() {
+    const parts = PROJECT_PATH.split('/')
+
+    return parts[parts.length-1]
 }
 
 //////////////////////////////////////////////////
